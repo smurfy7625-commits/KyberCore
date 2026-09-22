@@ -1,0 +1,36 @@
+# Local configuration / credentials
+.env
+*.env
+!.env.example
+
+# Runtime state and secrets
+config/
+app/config/
+*.jsonl
+
+# Container backups / archives
+backups/
+*.tar.gz
+*.tgz
+*.zip
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Development backups / temporary files
+*.backup-*
+*.bak
+*.tmp
+*.swp
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
