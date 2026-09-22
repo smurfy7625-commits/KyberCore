@@ -15,8 +15,7 @@ RUN apt-get update && \
 
 COPY requirements.txt /app/requirements.txt
 
-RUN pip install --no-cache-dir \
-    -r /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY app /app/app
 
@@ -24,11 +23,4 @@ RUN mkdir -p /app/config
 
 EXPOSE 8088
 
-CMD [
-  "uvicorn",
-  "app.main:app",
-  "--host",
-  "0.0.0.0",
-  "--port",
-  "8088"
-]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8088"]
