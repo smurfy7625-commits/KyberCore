@@ -1,61 +1,35 @@
-name: Build and Publish Kyber Core
+FROM python:3.11-slim
 
-on:
-  push:
-    branches:
-      - main
-    tags:
-      - "v*"
-  workflow_dispatch:
+WORKDIR /app
 
-permissions:
-  contents: read
-  packages: write
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: smurfy7625-commits/kybercore
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        docker.io \
+        docker-compose-plugin \
+        curl \
+        iproute2 \
+        smartmontools && \
+    rm -rf /var/lib/apt/lists/*
 
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
+COPY requirements.txt /app/requirements.txt
 
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+RUN pip install --no-cache-dir \
+    -r /app/requirements.txt
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+COPY app /app/app
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+RUN mkdir -p /app/config
 
-      - name: Generate Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=ref,event=tag
-            type=sha,format=short
-          labels: |
-            org.opencontainers.image.title=Kyber Core
-            org.opencontainers.image.description=OpenMediaVault homelab command center
-            org.opencontainers.image.source=https://github.com/smurfy7625-commits/KyberCore
+EXPOSE 8088
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          platforms: linux/amd64
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+CMD [
+  "uvicorn",
+  "app.main:app",
+  "--host",
+  "0.0.0.0",
+  "--port",
+  "8088"
+]
