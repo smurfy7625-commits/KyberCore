@@ -1,17 +1,66 @@
+
 services:
+  kyber-bridge-installer:
+    image: ghcr.io/smurfy7625-commits/kybercore:latest
+    container_name: kyber-bridge-installer
+    privileged: true
+    pid: host
+
+    volumes:
+      - /:/host
+
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+
+        echo "Installing Kyber OMV bridge..."
+
+        mkdir -p /host/opt/kyber-omv-bridge
+
+        cp /opt/kyber-installer/omv-bridge/bridge.py \
+          /host/opt/kyber-omv-bridge/bridge.py
+
+        cp /opt/kyber-installer/omv-bridge/start.sh \
+          /host/opt/kyber-omv-bridge/start.sh
+
+        cp /opt/kyber-installer/omv-bridge/kyber-omv-bridge.service \
+          /host/etc/systemd/system/kyber-omv-bridge.service
+
+        chmod 755 \
+          /host/opt/kyber-omv-bridge/bridge.py \
+          /host/opt/kyber-omv-bridge/start.sh
+
+        nsenter -t 1 -m -u -i -n -p \
+          systemctl daemon-reload
+
+        nsenter -t 1 -m -u -i -n -p \
+          systemctl enable --now kyber-omv-bridge.service
+
+        echo "Bridge installed."
+
+    restart: "no"
+
+
   kyber-core:
     image: ghcr.io/smurfy7625-commits/kybercore:latest
     container_name: kyber-core
+
+    depends_on:
+      kyber-bridge-installer:
+        condition: service_completed_successfully
+
     restart: unless-stopped
 
     ports:
-      - "8088:8088"
+      - "${KYBER_PORT:-8089}:8088"
 
     environment:
-      TZ: UTC
+      TZ: ${TZ:-UTC}
 
-      PUID: 1000
-      PGID: 100
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-100}
 
       COMPOSE_ROOT: /host/Compose
       STORAGE_ROOT: /host/srv
@@ -19,24 +68,17 @@ services:
 
       OMV_BRIDGE_SOCKET: /run/kyber-omv/bridge.sock
 
-      OLLAMA_URL: ""
-      OLLAMA_MODEL: qwen3:4b
+      OLLAMA_URL: ${OLLAMA_URL:-}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:4b}
 
-      AUTH_SESSION_SECONDS: 43200
-      AUTH_COOKIE_SECURE: "false"
-
-      HOST_COMPOSE_ROOT: /opt/compose
-      HOST_STORAGE_ROOT: /srv
+      AUTH_SESSION_SECONDS: ${AUTH_SESSION_SECONDS:-43200}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-false}
 
     volumes:
       - ./config:/app/config
-      - /opt/compose:/host/Compose
-      - /srv:/host/srv
+      - ${HOST_COMPOSE_ROOT:-/opt/compose}:/host/Compose
+      - ${HOST_STORAGE_ROOT:-/srv}:/host/srv
       - /var/run/docker.sock:/var/run/docker.sock
       - /run/kyber-omv:/run/kyber-omv
-
-    dns:
-      - 1.1.1.1
-      - 8.8.8.8
 
     pull_policy: always
