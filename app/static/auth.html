@@ -1,0 +1,458 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+<title>Kyber Core — Sign In</title>
+
+<link
+  rel="preconnect"
+  href="https://fonts.googleapis.com"
+>
+<link
+  rel="preconnect"
+  href="https://fonts.gstatic.com"
+  crossorigin
+>
+<link
+  href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap"
+  rel="stylesheet"
+>
+
+<style>
+* {
+    box-sizing:border-box;
+}
+
+html,
+body {
+    margin:0;
+    min-height:100%;
+    background:#030914;
+    color:#dcecff;
+    font-family:
+        Inter,
+        "Segoe UI",
+        system-ui,
+        sans-serif;
+}
+
+body {
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            #0c3856 0,
+            #071424 28%,
+            #030914 68%
+        );
+}
+
+.stars {
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.22;
+    background-image:
+        radial-gradient(
+            #fff 1px,
+            transparent 1px
+        );
+    background-size:41px 41px;
+}
+
+.auth-wrap {
+    position:relative;
+    z-index:1;
+    width:min(440px,calc(100vw - 32px));
+}
+
+.logo {
+    text-align:center;
+    margin-bottom:22px;
+}
+
+.logo-mark {
+    color:#27c8ff;
+    font-size:40px;
+    text-shadow:
+        0 0 12px #27c8ff,
+        0 0 30px #27c8ff66;
+}
+
+.logo h1 {
+    margin:8px 0 4px;
+    font-family:
+        "Russo One",
+        Impact,
+        sans-serif;
+    font-size:34px;
+    letter-spacing:.15em;
+    font-weight:400;
+    color:#070b12;
+    -webkit-text-stroke:
+        2px #f6d85b;
+    paint-order:
+        stroke fill;
+    text-shadow:
+        0 0 7px #f6d85b,
+        0 0 22px #f6d85b55;
+}
+
+.logo h1 span {
+    -webkit-text-stroke:
+        2px #27c8ff;
+    text-shadow:
+        0 0 7px #27c8ff,
+        0 0 22px #27c8ff55;
+}
+
+.logo small {
+    color:#66849c;
+    letter-spacing:.16em;
+}
+
+.card {
+    background:#06101bef;
+    border:1px solid #1c5572;
+    border-radius:7px;
+    padding:28px;
+    box-shadow:
+        0 20px 60px #0008,
+        0 0 28px #159bd522;
+}
+
+.card h2 {
+    margin:0 0 8px;
+    font-size:18px;
+    letter-spacing:.08em;
+}
+
+.description {
+    color:#7e9bb2;
+    line-height:1.45;
+    margin:0 0 22px;
+}
+
+label {
+    display:block;
+    margin:14px 0;
+    color:#8ea9bc;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+}
+
+input {
+    display:block;
+    width:100%;
+    margin-top:7px;
+    padding:12px;
+    border-radius:4px;
+    border:1px solid #1a455f;
+    background:#050c15;
+    color:#dcecff;
+    outline:none;
+}
+
+input:focus {
+    border-color:#27c8ff;
+    box-shadow:
+        0 0 0 2px #27c8ff22;
+}
+
+button {
+    width:100%;
+    margin-top:10px;
+    padding:12px;
+    border-radius:4px;
+    border:1px solid #1c5572;
+    background:#0b2234;
+    color:#9fe9ff;
+    font-weight:700;
+    cursor:pointer;
+}
+
+button:hover {
+    background:#10324b;
+}
+
+button:disabled {
+    opacity:.5;
+    cursor:wait;
+}
+
+#error {
+    min-height:20px;
+    margin-top:14px;
+    color:#ff6e78;
+    font-size:12px;
+}
+
+.security-note {
+    margin-top:18px;
+    color:#55758c;
+    font-size:11px;
+    text-align:center;
+    line-height:1.45;
+}
+</style>
+</head>
+
+<body>
+
+<div class="stars"></div>
+
+<div class="auth-wrap">
+
+<div class="logo">
+    <div class="logo-mark">◈</div>
+    <h1>KYBER <span>CORE</span></h1>
+    <small>HOMELAB COMMAND CENTER</small>
+</div>
+
+<div class="card">
+
+<h2 id="title">CHECKING SYSTEM…</h2>
+
+<p
+  id="description"
+  class="description"
+>
+Please wait.
+</p>
+
+<form
+  id="form"
+  hidden
+>
+
+<label>
+Username
+<input
+  id="username"
+  autocomplete="username"
+  maxlength="32"
+  required
+>
+</label>
+
+<label>
+Password
+<input
+  id="password"
+  type="password"
+  autocomplete="current-password"
+  maxlength="256"
+  required
+>
+</label>
+
+<label
+  id="confirmRow"
+  hidden
+>
+Confirm Password
+<input
+  id="passwordConfirm"
+  type="password"
+  autocomplete="new-password"
+  maxlength="256"
+>
+</label>
+
+<button
+  id="submit"
+  type="submit"
+>
+CONTINUE
+</button>
+
+<div id="error"></div>
+
+</form>
+
+</div>
+
+<div class="security-note">
+Your administrator password is stored as a salted hash.
+Kyber Core does not store the plaintext password.
+</div>
+
+</div>
+
+<script>
+let SETUP_MODE = false;
+
+const $ = selector =>
+    document.querySelector(selector);
+
+function errorMessage(value) {
+    if (
+        value &&
+        typeof value.detail === 'string'
+    ) {
+        return value.detail;
+    }
+
+    return 'Request failed.';
+}
+
+async function loadAuthState() {
+    try {
+        const response = await fetch(
+            '/api/auth/status',
+            {
+                credentials:'same-origin'
+            }
+        );
+
+        const state = await response.json();
+
+        if (state.authenticated) {
+            location.href = '/';
+            return;
+        }
+
+        if (!state.omv_ready) {
+            $('#title').textContent =
+                'OPENMEDIAVAULT REQUIRED';
+
+            $('#description').textContent =
+                state.omv_detail ||
+                'Kyber Core requires an OpenMediaVault host.';
+
+            $('#form').hidden = true;
+            return;
+        }
+
+        SETUP_MODE = !state.account_exists;
+
+        $('#form').hidden = false;
+
+        if (SETUP_MODE) {
+            $('#title').textContent =
+                'CREATE ADMINISTRATOR ACCOUNT';
+
+            $('#description').textContent =
+                'Create the first Kyber Core administrator account. ' +
+                'There are no default credentials.';
+
+            $('#confirmRow').hidden = false;
+
+            $('#password').autocomplete =
+                'new-password';
+
+            $('#submit').textContent =
+                'CREATE ACCOUNT';
+
+        } else {
+            $('#title').textContent =
+                'AUTHORIZED ACCESS';
+
+            $('#description').textContent =
+                'Sign in to access Kyber Core.';
+
+            $('#confirmRow').hidden = true;
+
+            $('#password').autocomplete =
+                'current-password';
+
+            $('#submit').textContent =
+                'SIGN IN';
+        }
+
+        $('#username').focus();
+
+    } catch (error) {
+        $('#title').textContent =
+            'CONNECTION ERROR';
+
+        $('#description').textContent =
+            String(error);
+    }
+}
+
+$('#form').addEventListener(
+    'submit',
+    async event => {
+
+        event.preventDefault();
+
+        $('#error').textContent = '';
+
+        const button = $('#submit');
+
+        button.disabled = true;
+
+        const payload = {
+            username:
+                $('#username').value.trim(),
+
+            password:
+                $('#password').value,
+        };
+
+        let endpoint =
+            '/api/auth/login';
+
+        if (SETUP_MODE) {
+            endpoint =
+                '/api/auth/setup';
+
+            payload.password_confirm =
+                $('#passwordConfirm').value;
+        }
+
+        try {
+            const response = await fetch(
+                endpoint,
+                {
+                    method:'POST',
+
+                    credentials:
+                        'same-origin',
+
+                    headers:{
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    errorMessage(result)
+                );
+            }
+
+            location.href = '/';
+
+        } catch (error) {
+            $('#error').textContent =
+                error.message;
+
+            button.disabled = false;
+        }
+    }
+);
+
+loadAuthState();
+</script>
+
+</body>
+</html>

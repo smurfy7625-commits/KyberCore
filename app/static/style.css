@@ -1,0 +1,158 @@
+*{box-sizing:border-box}html{background:#030914}body{margin:0;font:14px Inter,Segoe UI,system-ui,sans-serif;color:#dcecff;background:radial-gradient(circle at 70% 10%,#0b3150 0,#071424 24%,#030914 58%);min-height:100vh}.stars{position:fixed;inset:0;pointer-events:none;opacity:.25;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:41px 41px}aside{position:fixed;z-index:2;inset:0 auto 0 0;width:238px;background:#050b14eF;border-right:1px solid #18334b;padding:20px 13px}.brand{display:flex;gap:11px;align-items:center;font-size:19px;font-weight:800;letter-spacing:2px;padding:6px 8px 20px}.brand i{font-size:28px;color:#27c8ff}.brand span{color:#23c6ff}.brand small{display:block;font-size:8px;color:#66849c;letter-spacing:1.4px;margin-top:3px}nav button{width:100%;display:flex;gap:12px;padding:10px 12px;margin:2px 0;border:0;border-left:2px solid transparent;background:transparent;color:#7e9bb2;text-align:left;border-radius:4px;cursor:pointer}nav button:hover,nav button.active{background:#0b2133;color:#dff7ff;border-left-color:#24c9ff}.foot{position:absolute;bottom:16px;color:#4e6c83;font-size:10px;padding-left:10px}.foot b{color:#24c9ff}main{margin-left:238px;position:relative;z-index:1}header{height:66px;position:sticky;top:0;z-index:3;background:#06101beF;border-bottom:1px solid #17334a;display:flex;align-items:center;justify-content:space-between;padding:0 25px}header b{font-size:12px;letter-spacing:2px}header small{display:block;color:#59778d;margin-top:4px}.headright{display:flex;align-items:center;gap:12px}.headright span,.ok{color:#37d6a0;font-size:11px;letter-spacing:1px}button{background:#0b2234;color:#9fe9ff;border:1px solid #1c5572;padding:8px 12px;border-radius:4px;cursor:pointer;font-weight:600}button:hover{background:#10324b}.page{padding:24px;max-width:1500px;margin:auto}.hero{height:215px;border:1px solid #165274;border-radius:6px;background:linear-gradient(90deg,#061424dd,#07111a88),radial-gradient(circle at 80% 40%,#1878a5 0,#0b263e 18%,transparent 35%);display:flex;align-items:center;justify-content:space-between;padding:34px;margin-bottom:14px;overflow:hidden}.hero h1{font-size:34px;letter-spacing:5px;margin:4px 0;color:#ecfbff}.hero p{color:#54c8ef;letter-spacing:2px}.orb{width:155px;height:155px;border-radius:50%;border:1px solid #42d7ff;background:radial-gradient(circle at 35% 30%,#49d7ff,#0d6c99 18%,#071421 60%);box-shadow:0 0 45px #16aeea55}.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.metric,.panel,.tile{background:#07111deF;border:1px solid #173c56;border-radius:5px;padding:15px}.metric small{color:#66849a;text-transform:uppercase}.metric strong{display:block;font-size:22px;margin:8px 0;color:#effbff}.bar{height:4px;background:#10283b}.bar i{display:block;height:100%;background:#24c8ff}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.panel{margin-bottom:10px}.panelhead,.titlebar{display:flex;align-items:center;justify-content:space-between}.panel h2{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 12px}.titlebar h1,h1{letter-spacing:2px;margin:0 0 5px}.titlebar p,.page>p{color:#66849a;margin-top:0}.statusline,.row{display:grid;grid-template-columns:1.2fr 1.4fr .7fr .9fr;gap:10px;padding:10px 5px;border-top:1px solid #102b3f;align-items:center}.muted{color:#68869d}.badge{display:inline-block;padding:3px 7px;border:1px solid #17664e;color:#43d6a0;border-radius:12px;font-size:10px}.warn{color:#ffbd5c}.bad{color:#ff6e78}.search,.pathbar input,input,select,textarea{width:100%;background:#050c15;color:#dcecff;border:1px solid #1a455f;border-radius:4px;padding:11px}.search{margin:15px 0}.appgrid,.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}.app{min-height:190px;background:#07111d;border:1px solid #173c56;padding:16px;display:flex;flex-direction:column}.app h3{margin:0 0 7px}.app .buttons{margin-top:auto}.table{padding:4px 12px}.pathbar{display:flex;gap:8px;margin:12px 0}.pathbar input{flex:1}.form label{display:block;margin:12px 0;color:#8ea9bc}.form input,.form select{margin-top:5px}textarea{min-height:110px;margin-bottom:10px}pre{white-space:pre-wrap;word-break:break-word;background:#030912;border:1px solid #15364c;padding:12px;max-height:55vh;overflow:auto;color:#9fc9df}.modal{position:fixed;z-index:10;inset:0;background:#000b;padding:5vh 10vw}.modalbox{position:relative;background:#06101b;border:1px solid #1c5d7c;padding:22px;max-height:90vh;overflow:auto}.close{position:absolute;right:10px;top:8px;font-size:22px}.field{margin:12px 0}.field label{display:block;color:#7e9bb2;margin-bottom:5px}@media(max-width:900px){aside{width:64px}.brand div,nav span,.foot{display:none}.brand{padding-left:5px}main{margin-left:64px}.metrics{grid-template-columns:1fr 1fr}.twocol{grid-template-columns:1fr}.row{grid-template-columns:1fr 1fr}.hero{height:180px}.orb{display:none}}
+
+
+/* === KYBER STAR WARS INSPIRED BRANDING === */
+.hero h1,
+.foot,
+.logo,
+.brand,
+aside h1,
+aside .title {
+    font-family: "Orbitron", Arial, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 900;
+}
+
+.hero h1 {
+    color: #f0d45a;
+    text-shadow:
+        0 0 8px rgba(240, 212, 90, 0.20),
+        0 0 22px rgba(240, 212, 90, 0.12);
+    transform: perspective(900px) rotateX(12deg);
+}
+
+.foot {
+    color: #f0d45a;
+    letter-spacing: 0.16em;
+}
+
+
+
+/* === KYBER CINEMATIC LOGO V2 === */
+
+.hero h1,
+.logo,
+.brand,
+aside h1,
+aside .title {
+    font-family: "Russo One", Impact, sans-serif;
+    text-transform: uppercase;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+}
+
+/* Main KYBER CORE wordmark */
+.hero h1 {
+    position: relative;
+
+    color: #070b12;
+
+    -webkit-text-stroke:
+        2px #f6d85b;
+
+    paint-order:
+        stroke fill;
+
+    text-shadow:
+        0 0 2px #fff4ad,
+        0 0 7px rgba(246, 216, 91, 0.95),
+        0 0 16px rgba(246, 216, 91, 0.65),
+        0 0 32px rgba(246, 216, 91, 0.25),
+        0 0 54px rgba(64, 190, 255, 0.18);
+
+    transform:
+        perspective(900px)
+        rotateX(7deg)
+        scaleX(1.06);
+
+    transform-origin:
+        center;
+
+    filter:
+        drop-shadow(
+            0 6px 14px
+            rgba(0, 0, 0, 0.65)
+        );
+}
+
+/* Thin luminous line under the title */
+.hero h1::after {
+    content: "";
+    display: block;
+
+    width: 72%;
+    height: 2px;
+
+    margin:
+        12px auto 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #47c8ff,
+            #f6d85b,
+            #47c8ff,
+            transparent
+        );
+
+    box-shadow:
+        0 0 7px #47c8ff,
+        0 0 14px rgba(71, 200, 255, 0.55);
+
+    opacity: 0.9;
+}
+
+/* Sidebar / compact branding */
+.logo,
+.brand,
+aside h1,
+aside .title {
+    color: #f4d65a;
+
+    text-shadow:
+        0 0 5px rgba(244, 214, 90, 0.65),
+        0 0 12px rgba(71, 200, 255, 0.20);
+}
+
+/* Footer branding */
+.foot {
+    font-family:
+        "Russo One",
+        Impact,
+        sans-serif;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        0.18em;
+
+    color:
+        #d9c05a;
+
+    text-shadow:
+        0 0 8px
+        rgba(217, 192, 90, 0.35);
+}
+
+/* Smaller screens */
+@media (max-width: 700px) {
+    .hero h1 {
+        letter-spacing: 0.08em;
+
+        -webkit-text-stroke:
+            1.5px #f6d85b;
+
+        transform:
+            perspective(900px)
+            rotateX(5deg)
+            scaleX(1.02);
+    }
+
+    .hero h1::after {
+        width: 88%;
+    }
+}
+
