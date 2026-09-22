@@ -1,0 +1,24 @@
+[Unit]
+Description=Kyber Core OMV Compose Bridge
+After=network-online.target openmediavault-engined.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/opt/kyber-omv-bridge/start.sh
+Restart=on-failure
+RestartSec=3
+
+User=root
+Group=root
+
+RuntimeDirectory=kyber-omv
+RuntimeDirectoryMode=0700
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

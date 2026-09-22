@@ -1,97 +1,104 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
-if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
-  echo "Run this installer with sudo or as root."
-  exit 1
+REPO_URL="https://github.com/smurfy7625-commits/KyberCore.git"
+INSTALL_DIR="${KYBER_INSTALL_DIR:-/opt/kyber-core}"
+
+echo "===== KYBER CORE INSTALLER ====="
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "ERROR: run with sudo or as root."
+    exit 1
 fi
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$ROOT_DIR"
-
-echo "== Kyber Core OpenMediaVault installer =="
-
-for cmd in python3 docker systemctl omv-rpc; do
-  if ! command -v "$cmd" >/dev/null 2>&1; then
-    echo "ERROR: required command not found: $cmd"
+if [ ! -x /usr/sbin/omv-rpc ]; then
+    echo "ERROR: OpenMediaVault was not detected."
     exit 1
-  fi
-done
+fi
+
+if ! command -v docker >/dev/null 2>&1; then
+    echo "ERROR: Docker is required."
+    exit 1
+fi
 
 if ! docker compose version >/dev/null 2>&1; then
-  echo "ERROR: Docker Compose plugin is required."
-  exit 1
+    echo "ERROR: Docker Compose v2 is required."
+    exit 1
 fi
 
-if ! omv-rpc -u admin Compose getFileList '{"start":0,"limit":1,"sortfield":"name","sortdir":"ASC"}' >/dev/null 2>&1; then
-  echo "ERROR: OpenMediaVault Compose RPC is unavailable."
-  echo "Install/enable the OMV Compose plugin before Kyber Core."
-  exit 1
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+
+# If this script was downloaded by itself, fetch the repository so the
+# OMV bridge files and Compose file are available.
+if [ ! -f "$SCRIPT_DIR/omv-bridge/bridge.py" ] || \
+   [ ! -f "$SCRIPT_DIR/docker-compose.yml" ]; then
+
+    echo "Downloading Kyber Core repository..."
+
+    if ! command -v git >/dev/null 2>&1; then
+        apt-get update
+        apt-get install -y git
+    fi
+
+    rm -rf "$INSTALL_DIR"
+    git clone --depth 1 "$REPO_URL" "$INSTALL_DIR"
+
+    SCRIPT_DIR="$INSTALL_DIR"
 fi
+
+echo
+echo "===== INSTALL OMV BRIDGE ====="
 
 install -d -m 0755 /opt/kyber-omv-bridge
-install -m 0755 omv-bridge/bridge.py /opt/kyber-omv-bridge/bridge.py
-install -m 0755 omv-bridge/start.sh /opt/kyber-omv-bridge/start.sh
-install -m 0644 omv-bridge/kyber-omv-bridge.service /etc/systemd/system/kyber-omv-bridge.service
+
+install -m 0755 \
+    "$SCRIPT_DIR/omv-bridge/bridge.py" \
+    /opt/kyber-omv-bridge/bridge.py
+
+install -m 0755 \
+    "$SCRIPT_DIR/omv-bridge/start.sh" \
+    /opt/kyber-omv-bridge/start.sh
+
+install -m 0644 \
+    "$SCRIPT_DIR/omv-bridge/kyber-omv-bridge.service" \
+    /etc/systemd/system/kyber-omv-bridge.service
 
 systemctl daemon-reload
 systemctl enable --now kyber-omv-bridge.service
 
-if [[ ! -S /run/kyber-omv/bridge.sock ]]; then
-  echo "ERROR: OMV bridge socket was not created."
-  systemctl status kyber-omv-bridge.service --no-pager || true
-  exit 1
+sleep 2
+
+if [ ! -S /run/kyber-omv/bridge.sock ]; then
+    echo "ERROR: OMV bridge socket was not created."
+    systemctl --no-pager --full status kyber-omv-bridge.service || true
+    journalctl -u kyber-omv-bridge.service -n 80 --no-pager || true
+    exit 1
 fi
 
-if [[ ! -f .env ]]; then
-  cp .env.example .env
+echo "OMV bridge socket ready:"
+ls -l /run/kyber-omv/bridge.sock
 
-  DEFAULT_COMPOSE="/opt/compose"
-  [[ -d /Compose ]] && DEFAULT_COMPOSE="/Compose"
+echo
+echo "===== START KYBER CORE ====="
 
-  read -r -p "Host Compose root [$DEFAULT_COMPOSE]: " HOST_COMPOSE_INPUT || true
-  HOST_COMPOSE_INPUT="${HOST_COMPOSE_INPUT:-$DEFAULT_COMPOSE}"
+cd "$SCRIPT_DIR"
 
-  read -r -p "Host storage root [/srv]: " HOST_STORAGE_INPUT || true
-  HOST_STORAGE_INPUT="${HOST_STORAGE_INPUT:-/srv}"
-
-  python3 - "$HOST_COMPOSE_INPUT" "$HOST_STORAGE_INPUT" <<'PY'
-from pathlib import Path
-import sys
-p=Path('.env')
-s=p.read_text()
-s=s.replace('HOST_COMPOSE_ROOT=/opt/compose', f'HOST_COMPOSE_ROOT={sys.argv[1]}')
-s=s.replace('HOST_STORAGE_ROOT=/srv', f'HOST_STORAGE_ROOT={sys.argv[2]}')
-p.write_text(s)
-PY
-
-  chmod 0600 .env
+if [ ! -f .env ] && [ -f .env.example ]; then
+    cp .env.example .env
 fi
 
 mkdir -p config
-chmod 0700 config
 
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 
-PORT="$(awk -F= '/^KYBER_PORT=/{print $2}' .env | tail -1)"
-PORT="${PORT:-8088}"
+echo
+echo "===== VERIFY ====="
 
-for _ in $(seq 1 30); do
-  if python3 - "$PORT" <<'PY' >/dev/null 2>&1
-import sys, urllib.request
-urllib.request.urlopen(f'http://127.0.0.1:{sys.argv[1]}/api/auth/status', timeout=2).read()
-PY
-  then
-    echo
-    echo "Kyber Core is running."
-    echo "Open: http://YOUR-OMV-SERVER:${PORT}"
-    echo "Create the administrator account on first launch."
-    exit 0
-  fi
-  sleep 2
-done
+docker ps \
+    --filter name=kyber-core \
+    --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}\t{{.Image}}'
 
-echo "ERROR: Kyber Core did not become ready in time."
-docker compose ps || true
-docker compose logs --tail=100 kyber-core || true
-exit 1
+echo
+echo "Kyber Core installation complete."
+echo "Open the host port configured in docker-compose.yml/.env."
