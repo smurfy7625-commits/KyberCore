@@ -1,0 +1,26 @@
+KYBER CORE - QUICK INSTALL
+
+Repository:
+https://github.com/smurfy7625-commits/KyberCore
+
+Recommended installation:
+
+1. Clone the repository:
+   git clone https://github.com/smurfy7625-commits/KyberCore.git
+
+2. Enter the folder:
+   cd KyberCore
+
+3. Create the environment file:
+   cp .env.example .env
+
+4. Install/start Kyber Core:
+   chmod +x install.sh
+   sudo ./install.sh
+
+5. Open:
+   http://OPENMEDIAVAULT-IP:8088
+
+IMPORTANT:
+Kyber Core is currently designed for OpenMediaVault.
+The Kyber OMV bridge must also be installed and running on the host.
