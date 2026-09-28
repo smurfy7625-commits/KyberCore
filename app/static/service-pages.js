@@ -42,7 +42,7 @@ function serviceWebPort(row){
 function serviceOpenUrl(row){
   const port = serviceWebPort(row);
   if(!port) return '';
-  return window.location.protocol + '//' + window.location.hostname + ':' + port;
+  const protocol = port === '443' ? 'https:' : 'http:';\n  return protocol + '//' + window.location.hostname + ':' + port;
 }
 
 function serviceCard(row){
