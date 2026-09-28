@@ -7,6 +7,7 @@ Kyber Core is a self-hosted **OpenMediaVault homelab command center** for Docker
 ## Highlights
 
 - First-run administrator account creation; no default credentials
+- Persistent signed login sessions across container restarts
 - Login-required dashboard and protected API routes
 - PBKDF2-SHA256 password hashing and HttpOnly session cookies
 - OpenMediaVault readiness check before account creation
@@ -92,7 +93,7 @@ For plain local HTTP, leave `AUTH_COOKIE_SECURE=false`. If Kyber Core is served 
 
 ## Authentication and account recovery
 
-The administrator record is stored in `config/auth.json`. Passwords are not stored in plaintext. Sessions are held in memory, so a Kyber Core restart signs users out without deleting the administrator account.
+The administrator record is stored in `config/auth.json`. Passwords are not stored in plaintext. Session signing uses a persistent secret stored in `config/auth_session_secret`, so normal Kyber Core container restarts do not invalidate signed sessions. Both files must remain on the persistent `/app/config` mount.
 
 If the administrator password is lost, from the repository directory on the OMV host:
 
@@ -123,9 +124,12 @@ From the repository directory:
 
 ```bash
 git pull
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 sudo systemctl restart kyber-omv-bridge.service
 ```
+
+Kyber Core should be updated last when it is orchestrating updates for other containers. Do not include `kyber-core` in a generic bulk stop/remove/recreate operation, because stopping the updater can interrupt the update before Kyber is started again. See [docs/UPDATING.md](docs/UPDATING.md) and `scripts/safe-update.sh`.
 
 Run `./scripts/privacy-audit.sh` before publishing your own fork or release.
 
